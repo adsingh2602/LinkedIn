@@ -24,5 +24,4 @@ public class LikesController {
         return ResponseEntity.noContent().build();
     }
 
-
 }
