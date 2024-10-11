@@ -53,7 +53,7 @@ Welcome to the LinkedInApp (Clone) project! This application is inspired by the 
 
 1. **Clone the Repository**  
    ```bash
-   git clone [https://github.com/adsingh2602/LinkedInApp.git](https://github.com/adsingh2602/LinkedIn.git)
+   git clone https://github.com/adsingh2602/LinkedIn.git
    ```
 
 2. **Navigate to the project directory**  
