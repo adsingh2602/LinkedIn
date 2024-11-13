@@ -6,11 +6,13 @@ import com.linkedin.posts_service.clients.ConnectionsClient;
 import com.linkedin.posts_service.dto.PersonDto;
 import com.linkedin.posts_service.dto.PostCreateRequestDto;
 import com.linkedin.posts_service.dto.PostDto;
+import com.linkedin.posts_service.event.PostCreatedEvent;
 import com.linkedin.posts_service.exception.ResourceNotFoundException;
 import com.linkedin.posts_service.repository.PostsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,22 +27,28 @@ public class PostsService {
     private final ModelMapper modelMapper;
     private final ConnectionsClient connectionsClient;
 
-    public PostDto createPost(PostCreateRequestDto postDto, Long userId) {
+    private final KafkaTemplate<Long, PostCreatedEvent> kafkaTemplate;
+
+    public PostDto createPost(PostCreateRequestDto postDto) {
+        Long userId = UserContextHolder.getCurrentUserId();
         Post post = modelMapper.map(postDto, Post.class);
         post.setUserId(userId);
 
         Post savedPost = postsRepository.save(post);
+
+        PostCreatedEvent postCreatedEvent = PostCreatedEvent.builder()
+                .postId(savedPost.getId())
+                .creatorId(userId)
+                .content(savedPost.getContent())
+                .build();
+
+        kafkaTemplate.send("post-created-topic", postCreatedEvent);
+
         return modelMapper.map(savedPost, PostDto.class);
     }
 
     public PostDto getPostById(Long postId) {
         log.debug("Retrieving post with ID: {}", postId);
-
-        Long userId = UserContextHolder.getCurrentUserId();
-
-        List<PersonDto> firstConnections = connectionsClient.getFirstConnections();
-
-//        TODO send Notifications to all connections
 
         Post post = postsRepository.findById(postId).orElseThrow(() ->
                 new ResourceNotFoundException("Post not found with id: "+postId));
