@@ -24,7 +24,7 @@ services:
     container_name: kafbat-ui
     image: ghcr.io/kafbat/kafka-ui:latest
     ports:
-      - 8090:8080
+      - 8080:8080
     depends_on:
       - kafka
     networks:
@@ -135,7 +135,7 @@ services:
     image: adsingh26/linkedin-app/api-gateway
     container_name: api-gateway
     ports:
-      - "8080:8080"
+      - "8090:8090"
     networks:
       - linkedin-network
     depends_on:
