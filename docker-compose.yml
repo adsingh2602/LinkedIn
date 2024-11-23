@@ -62,7 +62,7 @@ services:
     image: postgres
     container_name: user-db
     environment:
-      - POSTGRES_DB=userDB
+      - POSTGRES_DB=userdb
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=2611
     networks:
